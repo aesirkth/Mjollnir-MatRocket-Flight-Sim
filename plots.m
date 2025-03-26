@@ -113,22 +113,25 @@ drawnow
 
 ax9 = subplot(1,2,2);
 ax9.NextPlot = "add";
-mesh = stlread(".\Rocket_source\Mjollnir\Mjollnir_mesh.stl");
-patch(ax9, mesh, 'FaceColor', [0,0.2,0.2], ...
-    'EdgeColor',       'none',        ...
-    'FaceLighting',    'gouraud',     ...
-    'AmbientStrength', 0.6, ...
-    'FaceAlpha',       0.05);
+mesh     = stlread(my_rocket.mesh);
+mesh_tri = triangulation(mesh.ConnectivityList, mesh.Points);
+plt=trisurf(mesh_tri);
+plt.EdgeColor = 'none';
+plt.FaceColor = [0 0.4 0.4];
+plt.FaceAlpha = 0.1;
+material('dull');
+
+
 light(ax9)
 center_of_mass_normal_basis = zeros(size(rocket_historian.center_of_mass_absolute));
-for i = 1:width(center_of_mass_normal_basis); center_of_mass_normal_basis(:,i) = (reshape(rocket_historian.attitude(:,i),3,3)')*rocket_historian.center_of_mass_absolute(:,i);end
+for i = 1:size(center_of_mass_normal_basis,3); center_of_mass_normal_basis(:,:,i) = (rocket_historian.attitude(:,:,i)')*rocket_historian.center_of_mass_absolute(:,:,i);end
 
 vectorplot(ax9, center_of_mass_normal_basis, 'LineWidth', 1.4, 'LineStyle', '-', 'Marker', '.');
-vectorscatter(ax9, center_of_mass_normal_basis(:,1));
-vectorscatter(ax9, center_of_mass_normal_basis(:,end));
+vectorscatter(ax9, center_of_mass_normal_basis(:,1), 'filled');
+vectorscatter(ax9, center_of_mass_normal_basis(:,end), 'filled');
 vectorplot(ax9, rocket_historian.tank.center_of_mass_absolute, 'LineWidth', 1.4, 'LineStyle', '-', 'Marker', '.');
-vectorscatter(ax9, rocket_historian.tank.center_of_mass_absolute(:,1), 'd');
-vectorscatter(ax9, rocket_historian.tank.center_of_mass_absolute(:,end), 'd');
+vectorscatter(ax9, rocket_historian.tank.center_of_mass_absolute(:,  1), 'd', 'filled');
+vectorscatter(ax9, rocket_historian.tank.center_of_mass_absolute(:,end), 'd', 'filled');
 title(ax9, "Center-of-mass over time")
 axis(ax9, 'equal'); axis(ax9, 'padded'); 
 xlabel(ax9, "x [m]"); ylabel(ax8, "y [m]"); ylabel(ax8, "z [m]")
@@ -142,10 +145,10 @@ figure("name", "forces")
 
 ax10 = subplot(1,2,1);
 ax10.NextPlot = "add";
-plot(ax10, rocket_historian.t, mag(rocket_historian.force_absolute.vec))
-plot(ax10, rocket_historian.t, mag(rocket_historian.Mjollnir_mesh.force_absolute.vec))
-plot(ax10, rocket_historian.t, mag(rocket_historian.engine.force_absolute.vec))
-plot(ax10, rocket_historian.t, mag(rocket_historian.forces.Gravity.vec))
+plot(ax10, rocket_historian.t, mag(rocket_historian.force_absolute.vector))
+plot(ax10, rocket_historian.t, mag(rocket_historian.aerodynamics.force_absolute.vector))
+plot(ax10, rocket_historian.t, mag(rocket_historian.engine.force_absolute.vector))
+plot(ax10, rocket_historian.t, mag(rocket_historian.forces.Gravity.vector))
 title(ax10, "Force over time")
 xlabel(ax10, "time [s]"); ylabel(ax10, "force [N]");
 legend(ax10, "Total", "Lift", "Thrust", "Gravity");
@@ -153,24 +156,29 @@ legend(ax10, "Total", "Lift", "Thrust", "Gravity");
 ax11 = subplot(1,2,2);
 ax11.NextPlot = "add";
 
-plot(ax11, rocket_historian.t, rocket_historian.Mjollnir_mesh.lift_force_tensor(2,:));
-plot(ax11, rocket_historian.t, rocket_historian.Mjollnir_mesh.lift_force_tensor(3,:));
-plot(ax11, rocket_historian.t, rocket_historian.Mjollnir_mesh.lift_force_tensor(4,:));
-plot(ax11, rocket_historian.t, rocket_historian.Mjollnir_mesh.lift_force_tensor(6,:)+1e3);
-plot(ax11, rocket_historian.t, rocket_historian.Mjollnir_mesh.lift_force_tensor(7,:)+1e3);
-plot(ax11, rocket_historian.t, rocket_historian.Mjollnir_mesh.lift_force_tensor(8,:)+1e3);
+plot(ax11, rocket_historian.t, flatten(rocket_historian.lift_force_tensor(1,2,:))+0*1.e2);
+plot(ax11, rocket_historian.t, flatten(rocket_historian.lift_force_tensor(1,3,:))+1*1.e2);
+plot(ax11, rocket_historian.t, flatten(rocket_historian.lift_force_tensor(2,1,:))+2*1.e2);
+plot(ax11, rocket_historian.t, flatten(rocket_historian.lift_force_tensor(2,3,:))+3*1.e2);
+plot(ax11, rocket_historian.t, flatten(rocket_historian.lift_force_tensor(3,1,:))+4*1.e2);
+plot(ax11, rocket_historian.t, flatten(rocket_historian.lift_force_tensor(3,2,:))+5*1.e2);
+plot(ax11, [0,job.t_max], [1,1]*0*1.e2, "Color", [1,1,1]*0.5, "LineStyle","--")
+plot(ax11, [0,job.t_max], [1,1]*1*1.e2, "Color", [1,1,1]*0.5, "LineStyle","--")
+plot(ax11, [0,job.t_max], [1,1]*2*1.e2, "Color", [1,1,1]*0.5, "LineStyle","--")
+plot(ax11, [0,job.t_max], [1,1]*3*1.e2, "Color", [1,1,1]*0.5, "LineStyle","--")
+plot(ax11, [0,job.t_max], [1,1]*4*1.e2, "Color", [1,1,1]*0.5, "LineStyle","--")
+plot(ax11, [0,job.t_max], [1,1]*5*1.e2, "Color", [1,1,1]*0.5, "LineStyle","--")
 title(ax11, "Aerodynamic lift")
 xlabel(ax11, "time [s]"); ylabel(ax11, "force [N]");
-legend(ax11, "xy", "xz", "yx", "yz+1e3", "zx+1e3", "zy+1e3");
+legend(ax11, "xy+0e2", "xz+1e2", "yx+2e2", "yz+3e2", "zx+4e2", "zy+5e2");
 
 figure("name", "energy")
 ax12 = subplot(1,2,1);
 ax12.NextPlot = "add";
-plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.force_absolute.vec));
-plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.Mjollnir_mesh.force_absolute.vec));
-plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.engine.force_absolute.vec));
-plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.forces.Gravity.vec));
-
+plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.force_absolute.vector));
+plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.aerodynamics.force_absolute.vector));
+plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.engine.force_absolute.vector));
+plot(ax12, rocket_historian.t, mag(rocket_historian.velocity).*mag(rocket_historian.forces.Gravity.vector));
 title(ax12, "dWork/dt")
 xlabel(ax12, "time [s]"); ylabel(ax12, "power [W]");
 legend(ax12, "Total", "Aerodynamics", "Thrust", "Gravity")
@@ -187,8 +195,8 @@ legend(ax13, "Total")
 figure("name", "rotation")
 ax14 = subplot(1,2,1);
 rotation_rate = zeros(size(rocket_historian.rotation_rate));
-for i = 1:width(rotation_rate); rotation_rate(:,i) = (reshape(rocket_historian.attitude(:,i),3,3)')*rocket_historian.rotation_rate(:,i);end
-plot(ax14,rocket_historian.t, rocket_historian.rotation_rate)
+for i = 1:size(rotation_rate,3); rotation_rate(:,:,i) = (rocket_historian.attitude(:,:,i)')*rocket_historian.rotation_rate(:,:,i);end
+plot(ax14,rocket_historian.t, flatten(rotation_rate))
 title(ax14, "rotation-rate \omega")
 xlabel(ax14, "t [s]"); ylabel(ax14, "revs/s [Hz]");
-
+legend(ax14, "\omega_x", "\omega_y", "\omega_z")
