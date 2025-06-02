@@ -1,0 +1,12 @@
+function rocket = Mjollnir_FIL()
+
+rocket = Mjollnir();
+
+order = 3;
+rocket.models = {rocket.models{1:order-1}, @fjalar_HIL, }
+
+rocket.Fjalar = struct();
+rocket.Fjalar.output_stream = parallel.pool.PollableDataQueue(Destination="any");
+rocket.Fjalar.input_stream  = parallel.pool.PollableDataQueue(Destination="any");
+
+
