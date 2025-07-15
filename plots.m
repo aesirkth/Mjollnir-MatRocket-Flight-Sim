@@ -14,34 +14,29 @@ for index = 1:numel(fonts)
 set(groot,fonts{index}, "Times New Roman")
 end
 
-
-
 mag = @(v) sqrt(v(1,:).^2 + v(2,:).^2 + v(3,:).^2);
-
 
 color = [0.5 0 1];
 figlist = {};
-figlist{end+1} = figure("name", "trajectory");
-ax0 = axes();
-ax0.NextPlot = "add";
-title(ax0, "Trajectory");
-xlabel(ax0, "x [m]"); ylabel(ax0, "y [m]"); zlabel(ax0, "z [m]");
-grid(ax0, "on");
-zlim(ax0, [0,14000])
-xlim(ax0, [-1000,1000])
-ylim(ax0, [-1000,1000])
-axis(ax0, "equal");
-view(ax0, 45,45)
-if notick; xticks(ax0, []); yticks(ax0, []); zticks(ax0, []); end
-drawnow
+
+% Launch site coordinates
+lat0 = 67.889663108;
+lon0 = 21.10416625;
+alt0 = 341;
+wgs84 = wgs84Ellipsoid('meters');
+
+% Create figure and globe
+fig = uifigure("name", "trajectory");
+figlist{end+1} = fig;
+globe = geoglobe(fig);
+geobasemap(globe, 'satellite');
+
 
 figlist{end+1} = figure("name", "trajectory subplots");
-
-
 ax1 = subplot(2,2,1);
 ax1.NextPlot = "add";
 title(ax1, "Trajectory");
-xlabel(ax1, "x [m]"); ylabel(ax1, "y [m]"); zlabel(ax1, "z [m]");
+xlabel(ax1, "East [m]"); ylabel(ax1, "North [m]"); zlabel(ax1, "Altitude [m]");
 grid(ax1, "on");
 zlim(ax1, [0,14000])
 xlim(ax1, [-1000,1000])
@@ -54,27 +49,27 @@ drawnow
 ax2 = subplot(2,2,3);
 ax2.NextPlot = "add";
 title(ax2, "Wind-direction");
-xlabel(ax2, "x [m/s]"); ylabel(ax2, "y [m/s]");
+xlabel(ax2, "East [m/s]"); ylabel(ax2, "North [m/s]");
 axis(ax2, "equal");
 
 ax1xz = subplot(3,2,2);
 ax1xz.NextPlot = "add";
 title(ax1xz, "Trajectory");
-xlabel(ax1xz, "x [m]"); ylabel(ax1xz, "z [m]");
+xlabel(ax1xz, "East [m]"); ylabel(ax1xz, "Altitude [m]");
 grid(ax1xz, "on");
 if notick; xticks(ax1xz, []); yticks(ax1xz, []); end
 
 ax1yz = subplot(3,2,4);
 ax1yz.NextPlot = "add";
 title(ax1yz, "Trajectory");
-xlabel(ax1yz, "y [m]"); ylabel(ax1yz, "z [m]");
+xlabel(ax1yz, "North [m]"); ylabel(ax1yz, "Altitude [m]");
 grid(ax1yz, "on");
 if notick; xticks(ax1yz, []); yticks(ax1yz, []); end
 
 ax1xy = subplot(3,2,6);
 ax1xy.NextPlot = "add";
 title(ax1xy, "Trajectory");
-xlabel(ax1xy, "x [m]"); ylabel(ax1xy, "y [m]");
+xlabel(ax1xy, "East [m]"); ylabel(ax1xy, "North [m]");
 grid(ax1xy, "on");
 if notick; xticks(ax1xy, []); yticks(ax1xy, []); end
 
@@ -296,7 +291,30 @@ disp("Max-velocity (groundspeed):")
 disp(string(max(mag(rocket_historian.velocity - rocket_historian.atmosphere.wind_velocity))) + " m/s")
 
 
-vectorplot(ax0, flatten(rocket_historian.position), "Color", color);
+%%% Plot trajectory 
+
+% Convert ENU coordinates to geodetic
+[lat, lon, alt] = enu2geodetic(rocket_historian.position(1,:), rocket_historian.position(2,:), rocket_historian.position(3,:), lat0, lon0, alt0, wgs84);
+
+% Landing site coordinates (last point in trajectory, probably not accurate)
+landing_lat = lat(end);
+landing_lon = lon(end);
+landing_alt = alt(end);
+
+fprintf('Landing Site Coordinates:\n');
+fprintf('Latitude: %.6f°\n', landing_lat);
+fprintf('Longitude: %.6f°\n', landing_lon);
+fprintf('Altitude: %.2f m\n', landing_alt);
+
+% Plot trajectory
+geoplot3(globe, lat, lon, alt, 'Color', color);
+
+% Camera settings
+campos(globe, lat0 - 0.08, lon0 - 0.15, alt0 + 10000);
+campitch(globe, -25);
+camheading(globe, 35);
+
+
 vectorplot(ax1, flatten(rocket_historian.position), "Color", color);
 plot(ax1xz, flatten(rocket_historian.position(1,:,:)), flatten(rocket_historian.position(3,:,:)), "Color", color);
 plot(ax1yz, flatten(rocket_historian.position(2,:,:)), flatten(rocket_historian.position(3,:,:)), "Color", color);
