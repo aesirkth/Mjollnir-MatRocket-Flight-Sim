@@ -1,9 +1,0 @@
-function rocket = Mjollnir_FIL()
-
-rocket = Mjollnir();
-
-rocket.models = {rocket.models{:}, @send_to_fjalar};
-
-rocket.HIL = struct();
-rocet
-%rocket.serialport = serialport('COM4', 115200);
