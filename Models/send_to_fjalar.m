@@ -1,25 +1,22 @@
 function rocket = send_to_fjalar(rocket)
-persistent init
-persistent message
 
-if isempty(init)
-    message = rocket.HIL.protobuf.HilOut();
-    init = false;
-end
+FjalarMessage = rocket.HIL.protobuf.FjalarMessage();
+FjalarData    = rocket.HIL.protobuf.FjalarData();
+HilIn         = rocket.HIL.protobuf.HilIn();
 
+% Populate HilIn fields
+py.setattr(HilIn, 'ax', rocket.acceleration(1));
+py.setattr(HilIn, 'ay', rocket.acceleration(2));
+py.setattr(HilIn, 'az', rocket.acceleration(3));
+py.setattr(HilIn, 'gx', rocket.rotation_rate(1));
+py.setattr(HilIn, 'gy', rocket.rotation_rate(2));
+py.setattr(HilIn, 'gz', rocket.rotation_rate(3));
+py.setattr(HilIn, 'p', rocket.atmosphere.pressure * 1e-3);
 
-py.setattr(message, 'ax', rocket.acceleration(1));
-py.setattr(message, 'ay', rocket.acceleration(2));
-py.setattr(message, 'az', rocket.acceleration(3));
+% Correctly assign HilIn to FjalarData using CopyFrom
+py.getattr(FjalarData, 'hil_in').CopyFrom(HilIn);
 
-py.setattr(message, 'gx', rocket.rotation_rate(1));
-py.setattr(message, 'gy', rocket.rotation_rate(2));
-py.setattr(message, 'gz', rocket.rotation_rate(3));
-
-py.setattr(message, 'p', rocket.atmosphere.pressure*1e-3);
-raw_bytes = message.SerializeToString();
-byte_array = uint8(raw_bytes);
-write(rocket.serialport, byte_array, "uint8");
-
+% Assign FjalarData to FjalarMessage
+py.getattr(FjalarMessage, 'data').CopyFrom(FjalarData);
 
 end
