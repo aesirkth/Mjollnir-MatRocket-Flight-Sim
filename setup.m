@@ -1,11 +1,5 @@
-if ~exist("is_setup",   "var"); is_setup   = false; end
 
-
-
-if ~is_setup
-
-
-pip_libraries = {"CoolProp", "MatlabBlenderIO", "MatRocket"};
+pip_libraries = {"MatlabBlenderIO", "MatRocket"};
 
 for index = 1:numel(pip_libraries)
 library = pip_libraries{index};
@@ -26,8 +20,3 @@ addpath(".\Models\")
 addpath(".\Parameter_studies\")
 addpath(".\lib\")
 addpath(".\Fjalar_in_the_loop\")
-end
-
-
-is_setup = true;
-    

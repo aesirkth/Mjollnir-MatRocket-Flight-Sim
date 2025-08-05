@@ -1,4 +1,4 @@
-function rocket = atmosphere_model(rocket, file)
+function rocket = atmosphere_model(rocket)
 
 persistent init
 persistent pressure
@@ -9,12 +9,29 @@ persistent wind_velocity
 
 % On startup
 if isempty(init)
-rawdata = readmatrix(file);
-raw_pressure       = rawdata(:,4);
-raw_altitude       = rawdata(:,5);
-raw_temperature    = rawdata(:,6);
-raw_wind_direction = rawdata(:,12);
-raw_wind_magnitude = rawdata(:,13);
+
+
+[~, is_url] = urlread(rocket.atmosphere.dataset);
+if is_url
+rawdata = webread(rocket.atmosphere.dataset);
+else
+rawdata = readtable(rocket.atmosphere.dataset);
+end
+
+
+raw_pressure       = rawdata.pressure_hPa         (1:end);
+raw_altitude       = rawdata.geopotentialHeight_m (1:end);
+raw_temperature    = rawdata.temperature_C        (1:end);
+raw_wind_direction = rawdata.windDirection_degree (1:end);
+raw_wind_magnitude = rawdata.windSpeed_m_s        (1:end);
+
+nan_elements = isnan(raw_pressure) | isnan(raw_altitude) | isnan(raw_temperature) | isnan(raw_wind_direction) | isnan(raw_wind_magnitude);
+
+raw_pressure       = raw_pressure      (~nan_elements);
+raw_altitude       = raw_altitude      (~nan_elements);
+raw_temperature    = raw_temperature   (~nan_elements);
+raw_wind_direction = raw_wind_direction(~nan_elements);
+raw_wind_magnitude = raw_wind_magnitude(~nan_elements);
 
 
 raw_pressure       = [raw_pressure(1)       ; raw_pressure(:)      ];
@@ -31,9 +48,9 @@ air_specific_heat_ratio = 1.4;
 
 
 pressure       = @(h) makima(raw_altitude, raw_pressure,    h)*1e2;
-temperature    = @(h) makima(raw_altitude, raw_temperature, h);
-density        = @(h) pressure(h) * air_molar_mass/(R * (temperature(h) + celsius2kelvin));
-speed_of_sound = @(h) sqrt(air_specific_heat_ratio * R * temperature(h));
+temperature    = @(h) makima(raw_altitude, raw_temperature, h)  + celsius2kelvin;
+density        = @(h) pressure(h) * air_molar_mass/(R * (temperature(h)));
+speed_of_sound = @(h) sqrt(air_specific_heat_ratio *pressure(h) / density(h) );
 wind_velocity  = @(h) makima(raw_altitude, raw_wind_magnitude, h).*[sind(makima(raw_altitude, raw_wind_direction, h));
                                                                     cosd(makima(raw_altitude, raw_wind_direction, h));
                                                                     0];
@@ -43,13 +60,11 @@ init = false;
 end
 
 
-rocket.atmosphere.pressure       = pressure(rocket.position(3));
-rocket.atmosphere.temperature    = temperature(rocket.position(3));
-rocket.atmosphere.density        = density(rocket.position(3));
-rocket.atmosphere.speed_of_sound = speed_of_sound(rocket.position(3));
-rocket.atmosphere.wind_velocity  = wind_velocity(rocket.position(3));
-
-
+rocket.atmosphere.pressure       = pressure       (rocket.position(3));
+rocket.atmosphere.temperature    = temperature    (rocket.position(3));
+rocket.atmosphere.density        = density        (rocket.position(3));
+rocket.atmosphere.speed_of_sound = speed_of_sound (rocket.position(3));
+rocket.atmosphere.wind_velocity  = wind_velocity  (rocket.position(3));
 
 
 end

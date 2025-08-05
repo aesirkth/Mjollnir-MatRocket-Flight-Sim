@@ -1,4 +1,6 @@
+if ~exist("rocket_historians", "var")
 rocket_historians = {rocket_historian};
+end
 study_name = "main";
 notick = false;
 set(groot, 'defaultAxesTickLabelInterpreter','latex'); 
