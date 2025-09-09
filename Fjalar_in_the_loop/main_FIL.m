@@ -2,7 +2,7 @@ setup_FIL
 my_rocket = Mjollnir_FIL();
 
 
-job = struct(); job.t_max = 25; job.ode_solver = @realtime_ode;
+job = struct(); job.t_max = 60; job.ode_solver = @realtime_ode;
 
 rocket_historian = run_simulation(my_rocket, job);
 if isfile(".\Output\flight.csv")
