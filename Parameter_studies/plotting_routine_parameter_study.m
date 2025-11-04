@@ -1,5 +1,5 @@
-load("Parameter_studies\thrust_study.mat")
-study_name = "thrust_study";
+load("./Parameter_studies/ode_study.mat")
+study_name = "ode-study";
 
 notick = false;
 set(groot, 'defaultAxesTickLabelInterpreter','latex'); 
@@ -291,7 +291,7 @@ disp(string(max(rocket_historian.position(3,:))) + " m")
 disp("Max-velocity (groundspeed):")
 disp(string(max(mag(rocket_historian.velocity))) + " m/s")
 disp("Max-velocity (groundspeed):")
-disp(string(max(mag(rocket_historian.velocity - rocket_historian.enviroment.wind_velocity))) + " m/s")
+disp(string(max(mag(rocket_historian.velocity - rocket_historian.atmosphere.wind_velocity))) + " m/s")
 
 
 vectorplot(ax0, flatten(rocket_historian.position), "Color", colors(i,:));
@@ -301,10 +301,10 @@ plot(ax1yz, flatten(rocket_historian.position(2,:,:)), flatten(rocket_historian.
 plot(ax1xy, flatten(rocket_historian.position(1,:,:)), flatten(rocket_historian.position(2,:,:)), "Color", colors(i,:));
 drawnow
 
-quiver(ax2, 0,0,rocket_historian.enviroment.wind_velocity(1,1,1),rocket_historian.enviroment.wind_velocity(2,1,1), "Color", colors(i,:));
+quiver(ax2, 0,0,rocket_historian.atmosphere.wind_velocity(1,1,1),rocket_historian.atmosphere.wind_velocity(2,1,1), "Color", colors(i,:));
 drawnow
 
-plot(ax4, rocket_historian.t, rocket_historian.enviroment.air_density, "Color", colors(i,:));
+plot(ax4, rocket_historian.t, rocket_historian.atmosphere.density, "Color", colors(i,:));
 
 drawnow
 
@@ -316,7 +316,7 @@ drawnow
 
 
 plot(ax6, rocket_historian.t, mag(rocket_historian.velocity), "Color", colors(i,:));
-plot(ax6, rocket_historian.t, mag(rocket_historian.velocity - rocket_historian.enviroment.wind_velocity),"LineStyle", "--", "Color", colors(i,:));
+plot(ax6, rocket_historian.t, mag(rocket_historian.velocity - rocket_historian.atmosphere.wind_velocity),"LineStyle", "--", "Color", colors(i,:));
 
 
 
@@ -326,7 +326,7 @@ mach = @(v) v/343.2;
 
 mag = @(v) sqrt(v(1,:).^2 + v(2,:).^2 + v(3,:).^2);
 
-plot(ax7, rocket_historian.t, mach(mag(rocket_historian.velocity - rocket_historian.enviroment.wind_velocity)), "Color", colors(i,:));
+plot(ax7, rocket_historian.t, mach(mag(rocket_historian.velocity - rocket_historian.atmosphere.wind_velocity)), "Color", colors(i,:));
 drawnow
 
 

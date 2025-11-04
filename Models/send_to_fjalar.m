@@ -1,5 +1,18 @@
 function rocket = send_to_fjalar(rocket)
 
+persistent init
+
+
+if isempty(init)
+
+%% Do all the initiation shit here, runs on first simulation iteration
+
+
+init = false;
+end
+
+
+
 FjalarMessage = rocket.HIL.protobuf.FjalarMessage();
 FjalarData    = rocket.HIL.protobuf.FjalarData();
 HilIn         = rocket.HIL.protobuf.HilIn();

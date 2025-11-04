@@ -1,0 +1,23 @@
+setup;
+warning("off");
+clear base_UI_loading_bar
+
+num_sims             = 3;
+my_rocket            = Mjollnir();
+my_rocket.atmosphere.dataset = random_wind_dataset("02185", datetime(2010, 1, 1), datetime(2025, 06, 21));
+
+rocket_historians    = cell(num_sims,1);
+jobs                 = repmat({struct()},1,3);
+jobs{1}.ode_solver   = @ode45;
+jobs{2}.ode_solver   = @realtime_ode;
+jobs{1}.t_max        = 300;
+jobs{2}.t_max        = 300;
+
+for i = 1:num_sims
+    rocket_historians{i} = run_simulation(my_rocket , jobs{i});
+end
+
+
+save("./Parameter_studies/ode_study.mat")
+
+plotting_routine_parameter_study

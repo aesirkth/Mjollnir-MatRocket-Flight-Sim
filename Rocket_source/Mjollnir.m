@@ -3,7 +3,8 @@ function rocket = Mjollnir()
     rocket                  = csv2obj('.\Rocket_source\Mjollnir.csv');
     rocket.name             = "Mjollnir";
 
-    rocket.models           = {@atmosphere_model,               ...
+    rocket.models           = {@base_UI_loading_bar,            ...
+                               @atmosphere_model,               ...
                                @simple_tank_model,              ...
                                @base_equations_of_motion_model, ...
                                @base_propulsion_model,          ...
@@ -40,11 +41,11 @@ function rocket = Mjollnir()
     
     
     
-    rocket.attitude                        = eye(3);          rocket.derivative("attitude")         = zeros(3);
-    rocket.angular_momentum                = zeros(3,1);      rocket.derivative("angular_momentum") = zeros(3,1);
-    rocket.rotation_rate                   = zeros(3,1);
-    rocket.position                        = [0;0;0];         rocket.derivative("position")         = zeros(3,1);
-    rocket.velocity                        = zeros(3,1);      rocket.derivative("velocity")         = zeros(3,1);
+    rocket.attitude                            = eye(3);          rocket.derivative("attitude")         = zeros(3);
+    rocket.angular_momentum                    = zeros(3,1);      rocket.derivative("angular_momentum") = zeros(3,1);
+    rocket.rotation_rate                       = zeros(3,1);
+    rocket.position                            = [0;0;0];         rocket.derivative("position")         = zeros(3,1);
+    rocket.velocity                            = zeros(3,1);      rocket.derivative("velocity")         = zeros(3,1);
     
 
     
