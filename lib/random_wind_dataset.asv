@@ -1,0 +1,8 @@
+function random_wind_dataset(station_number, start_date, end_date)
+
+"https://weather.uwyo.edu/wsgi/sounding?datetime=2024-11-14%203:00:00&id=%2002185&src=UNKNOWN&type=TEXT:CSV"
+
+dates = start_date:hours(3):end_date;
+date = dates(randi(numel(dates)));
+
+possible_hours = [00 03 06 09 12 15 1]

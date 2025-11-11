@@ -2,11 +2,10 @@ function rocket = Mjollnir_FIL()
 
 rocket = Mjollnir();
 
-order = 3;
-rocket.models = {rocket.models{1:order-1}, @fjalar_HIL, rocket.models{order:end}};
+rocket.models = {rocket.models{:}, @send_to_fjalar};
 
-rocket.Fjalar = struct();
-rocket.Fjalar.output_stream = parallel.pool.PollableDataQueue(Destination="any");
-rocket.Fjalar.input_stream  = parallel.pool.PollableDataQueue(Destination="any");
+rocket.HIL = struct();
+rocket.HIL.protobuf = py.importlib.import_module('schema_pb2');
+rocket.serialport = serialport('COM7', 115200);
 
-
+clear send_to_fjalar

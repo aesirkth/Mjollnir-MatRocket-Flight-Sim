@@ -1,11 +1,8 @@
 setup;
-
+clear all;
 my_rocket = Mjollnir();
-%order = 4;
-%my_rocket.models = {my_rocket.models{1:order-1}, @drag_coefficient_model, my_rocket.models{order:end}};
+my_rocket.atmosphere.dataset = random_wind_dataset("02185", datetime(2010, 1, 1), datetime(2025, 06, 21));
 
-my_rocket.engine.thrust_force = 3300;
-my_rocket.atmosphere.wind_velocity = [2;0;0];
 job = struct(); job.t_max = 300;
 
 rocket_historian = run_simulation(my_rocket, job);

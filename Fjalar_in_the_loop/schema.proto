@@ -1,0 +1,230 @@
+syntax = "proto3";
+import "nanopb.proto";
+
+enum FlightState {
+    idle = 0;
+    awaiting_init = 1;
+    initated = 2;
+    awaiting_launch = 3;
+    boost = 4;
+    coast = 5;
+    free_fall = 6;
+    drogue_descent = 7;
+    main_descent = 8;
+    landed = 9;
+}
+
+message FlightEvent {
+    bool launch = 1;
+    bool burnout = 2;
+    bool apogee = 3;
+    bool main_deploy = 4;
+    bool drogue_deploy = 5;
+    bool landed = 6;
+    bool above_acs_threshold = 7;
+}
+
+message Acknowledge {
+    bool success = 1;
+}
+
+message PressureReading {
+    float pressure = 1;
+}
+
+message ImuReading {
+    float ax = 1;
+    float ay = 2;
+    float az = 3;
+    float gx = 4;
+    float gy = 5;
+    float gz = 6;
+}
+
+message StateEstimate {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    float vx = 4;
+    float vy = 5;
+    float vz = 6;
+
+    float roll = 7;
+    float pitch = 8;
+    float yaw = 9;
+}
+
+message CANBus {
+    bool can_started = 1;
+    fixed32 loki_latest_rx_time = 2;
+    fixed32 loki_latest_tx_time = 3;
+    fixed32 sigurd_latest_rx_time = 4;
+    fixed32 sigurd_latest_tx_time = 5;
+}
+
+message PyroStatus {
+    bool pyro1_connected = 1;
+    bool pyro2_connected = 2;
+    bool pyro3_connected = 3;
+}
+
+message CAN_LokiToFjalar {
+    int32 loki_state = 1;
+    int32 loki_substate = 2;
+    float loki_current_angle = 3;
+    float loki_battery_voltage = 4;
+}
+
+message CAN_FjalarToLoki {
+    FlightState flight_state = 1;
+    FlightEvent flight_event = 2;
+    bool enable_airbrakes = 3;
+    float airbrakes_angle = 4;
+}
+
+message CAN_SigurdToFjalar{
+    float sensor_data_1 = 1; //?
+    float sensor_data_2 = 2; //?
+    float sensor_data_3 = 3; //?
+    float sensor_data_4 = 4; //?
+}
+
+message CAN_FjalarToSigurd{
+
+}
+
+message CAN_FafnirToFjalar{
+
+}
+
+message CAN_FjalarToFafnir{
+    bool open_solenoid_1 = 1; //?
+    bool open_solenoid_2 = 2; //?
+    bool open_solenoid_3 = 3; //?
+    bool open_solenoid_4 = 4; //?
+    bool open_main_valve = 5; //?
+}
+
+message LORA_GcbToFjalar{
+    bool ready_initiate_fjalar = 1; //?
+    bool ready_launch_fjalar = 2; //?
+}
+
+message LORA_FjalarToGcb{
+    // ig this is same as FjalarData
+}
+
+message Fjalar_Info {
+    float fjalar_battery_voltage = 1;
+    int32 flash_address = 2;
+    bool sudo = 3;
+}
+
+message GnssPosition {
+    float longitude = 1;
+    float latitude = 2;
+    float altitude = 3;
+}
+
+message GnssStatus {
+    int32 fix = 1;
+    int32 num_satellites = 2;
+    float hdop = 3;
+    float vdop = 4;
+}
+
+message SetSudo {
+    bool enabled = 1;
+}
+
+message ClearFlash {
+
+}
+
+message ReadFlash {
+    int32 start_index = 1;
+    int32 length = 2;
+}
+
+message FlashData {
+    int32 start_index = 1;
+    bytes data = 2 [(nanopb).max_size = 64];
+}
+
+message ReadyUp {
+
+}
+
+message EnterIdle {
+
+}
+
+message TriggerPyro {
+    int32 pyro = 1;
+}
+
+message HilIn{
+    float ax = 1;
+    float ay = 2;
+    float az = 3;
+
+    float gx = 4;
+    float gy = 5;
+    float gz = 6;
+
+    float p = 7;
+
+    float lon = 8;
+    float lat = 9;
+    float alt = 10;
+
+    uint32 time = 11;
+
+    bool awaiting_init = 12;
+    bool awaiting_launch = 13;
+}
+
+message HilOut{
+    float airbrake_percentage = 1;
+    bool main_deployed = 2;
+    bool drogue_deployed = 3;
+}
+
+message FjalarData {
+    oneof data {
+        Acknowledge acknowledge = 1;
+        ImuReading imu_reading = 3;
+        PressureReading pressure_reading = 4;
+        GnssPosition gnss_position = 5;
+        GnssStatus gnss_status = 6;
+        SetSudo set_sudo = 8;
+        ClearFlash clear_flash = 9;
+        ReadFlash read_flash = 10;
+        FlashData flash_data = 11;
+        ReadyUp ready_up = 12;
+        EnterIdle enter_idle = 13;
+        TriggerPyro trigger_pyro = 14;
+        HilIn hil_in = 15;
+        HilOut hil_out = 16;
+        StateEstimate state_estimate = 17;
+        FlightState flight_state = 18;
+        FlightEvent flight_event = 19;
+        CANBus can_bus = 20;
+        PyroStatus pyro_status = 21;
+        CAN_LokiToFjalar can_loki_to_fjalar = 22;
+        CAN_FjalarToLoki can_fjalar_to_loki = 23;
+        CAN_SigurdToFjalar can_sigurd_to_fjalar = 24;
+        CAN_FjalarToSigurd can_fjalar_to_sigurd = 25;
+        CAN_FafnirToFjalar can_fafnir_to_fjalar = 26;
+        CAN_FjalarToFafnir can_fjalar_to_fafnir = 27;
+        LORA_GcbToFjalar lora_gcb_to_fjalar = 28;
+        LORA_FjalarToGcb lora_fjalar_to_gcb = 29;
+    };
+}
+
+message FjalarMessage {
+    fixed32 time = 1;
+    int32 sequence_number = 2;
+    FjalarData data = 3;
+}
+
