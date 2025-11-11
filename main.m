@@ -12,5 +12,5 @@ rocket_historian = query_historian(rocket_historian, 0:1/30:job.t_max);
 delete (".\Output\flight.csv")
 obj2csv(".\Output\flight.csv", rocket_historian);
 save(".\Output\flight.mat")
-
+disp("hej")
 plots
