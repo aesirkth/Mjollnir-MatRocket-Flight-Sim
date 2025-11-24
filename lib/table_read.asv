@@ -1,0 +1,3 @@
+load("test.mat")
+data = tables{size();
+disp(data.pressure_hPa);

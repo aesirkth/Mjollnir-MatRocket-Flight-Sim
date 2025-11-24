@@ -7,11 +7,15 @@ persistent density
 persistent speed_of_sound
 persistent wind_velocity
 
+disp
 
 % On startup
 if isempty(init)
 
 rawdata = rocket.atmosphere.dataset;
+
+disp("3")
+
 
 raw_pressure       = rawdata.pressure_hPa         (1:end);
 raw_altitude       = rawdata.geopotentialHeight_m (1:end);
@@ -52,6 +56,8 @@ wind_velocity  = @(h) makima(raw_altitude, raw_wind_magnitude, h).*[sind(makima(
 
 init = false;
 end
+
+disp("4")
 
 rocket.atmosphere.pressure       = pressure       (rocket.position(3));
 rocket.atmosphere.temperature    = temperature    (rocket.position(3));

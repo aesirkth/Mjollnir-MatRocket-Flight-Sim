@@ -20,14 +20,25 @@ max_sims = 1e3;
 
 rocket_historians = cell(1,max_sims);
 
+
+
+
 save(".\Parameter_studies\monte_carlo.mat", '-v7.3')
 end
+
+
+wind_data = load("test.mat");
+wind_data.tables = trimdata(wind_data.tables, 2025);
+
 
 
 while sim_nr < max_sims
 clear atmosphere_model
 try
-my_rocket.atmosphere.dataset                   = random_wind_dataset("02185", datetime(2010, 1, 1), datetime(2025, 06, 21));
+
+disp(wind_data.tables{randi(2025)});
+my_rocket.atmosphere.dataset = wind_data.tables{randi(2025)};
+disp("2")
 my_rocket.engine.thrust_force                  = thrust_force(randi(numel(thrust_force)));
 my_rocket.aerodynamics.drag_coefficient_offset = drag_coefficient_offset(randi(numel(drag_coefficient_offset)));
 
