@@ -18,6 +18,7 @@ impact_positions = cell2mat(impact_positions);
 %surf(X,Y,P);
 
 % Geomapping
+figure;
 wgs84 = wgs84Ellipsoid('meters');
 geobasemap satellite
 
@@ -26,9 +27,16 @@ lat0 = 67.889663108;
 lon0 = 21.10416625;
 alt0 = 341;
 
+% Impact zone A
+latA = [67.8723008, 67.8723084, 67.8723660, 67.8780572, 67.8801491, 67.8821042, 67.8832564, 67.8844700, 67.9101134, 67.9532620, 67.9761755, 67.9173745, 67.8996103, 67.8723008];
+longA = [21.0393914, 21.0515890, 21.1438720, 21.1521476, 21.1521790, 21.1562466, 21.1614810, 21.1614749, 21.1987985, 21.1982443, 20.9897495, 20.9880485, 21.0275520, 21.0393914];
+geoplot(latA, longA, 'b', 'LineWidth', 2);
+hold on;
+
 % Convert ENU coordinates to geodetic
 [lat, lon, alt] = enu2geodetic(impact_positions(1,:), impact_positions(2,:), zeros(1, size(impact_positions,2)), lat0, lon0, alt0, wgs84);
 
+% Plot impact points
 geoscatter(lat, lon, 30, 'r');
 
 %scatter(impact_positions(1,:), impact_positions(2,:));
