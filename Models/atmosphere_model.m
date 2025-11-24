@@ -13,7 +13,16 @@ if isempty(init)
 
 [~, is_url] = urlread(rocket.atmosphere.dataset);
 if is_url
+data_read = false;
+while ~data_read
+try
 rawdata = webread(rocket.atmosphere.dataset);
+data_read = true;
+catch
+warning("Timeout occurred while retrieving weather data... Trying again...")
+end
+end
+
 else
 rawdata = readtable(rocket.atmosphere.dataset);
 end
