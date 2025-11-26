@@ -31,14 +31,12 @@ wind_data = load("test.mat");
 wind_data.tables = trimdata(wind_data.tables, 2025);
 
 
-
 while sim_nr < max_sims
 clear atmosphere_model
 try
 
-disp(wind_data.tables{randi(2025)});
 my_rocket.atmosphere.dataset = wind_data.tables{randi(2025)};
-disp("2")
+disp(":)")
 my_rocket.engine.thrust_force                  = thrust_force(randi(numel(thrust_force)));
 my_rocket.aerodynamics.drag_coefficient_offset = drag_coefficient_offset(randi(numel(drag_coefficient_offset)));
 
