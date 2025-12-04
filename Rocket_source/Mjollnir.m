@@ -30,6 +30,7 @@ function rocket = Mjollnir()
     rocket.atmosphere.wind_velocity        = [0;0;0];
     rocket.atmosphere.dataset              = ".\Rocket_source\Wind_Data\2024113000-02185.csv";
     
+    
     %% Rigid-body model
     rocket.rigid_body                      = struct();
     rocket.rigid_body.is_body              = true;

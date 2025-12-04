@@ -1,7 +1,13 @@
 setup;
 clear all;
 my_rocket = Mjollnir();
-my_rocket.atmosphere.dataset = random_wind_dataset("02185", datetime(2010, 1, 1), datetime(2025, 06, 21));
+
+
+wind_data = load("test.mat");
+wind_data.tables = trimdata(wind_data.tables, 2025);
+
+
+my_rocket.atmosphere.dataset = wind_data.tables{randi(2025)};
 
 job = struct(); job.t_max = 200; job.ode_solver = @realtime_ode;
 
