@@ -7,7 +7,6 @@ persistent density
 persistent speed_of_sound
 persistent wind_velocity
 
-
 % On startup
 if isempty(init)
 
@@ -40,25 +39,20 @@ celsius2kelvin          = 273.15;
 air_specific_heat_ratio = 1.4;
 
 
-%switch to linear interpolation (maybe?)
-%sin(interpolation)) fucks up the data, since it wraps from 0 to 360
-%the ODE solver continues until time runs out, rather than when altitude =
-%0 again
-%the spline can still go in any direction, meaning we might get the
-%complete opposite effect
 
-%change time step maybe
 pressure       = @(h) makima(raw_altitude, raw_pressure,    h)*1e2;
 temperature    = @(h) makima(raw_altitude, raw_temperature, h)  + celsius2kelvin;
 density        = @(h) pressure(h) * air_molar_mass/(R * (temperature(h)));
 speed_of_sound = @(h) sqrt(air_specific_heat_ratio *pressure(h) / density(h) );
-wind_velocity  = @(h) makima(raw_altitude, raw_wind_magnitude, h).*[sind(makima(raw_altitude, raw_wind_direction, h));
-                                                                    cosd(makima(raw_altitude, raw_wind_direction, h));
-                                                                    0];
+wind_velocity  = @(h)[makima(raw_altitude, raw_wind_magnitude .* sind(raw_wind_direction), h);
+                      makima(raw_altitude, raw_wind_magnitude .* cosd(raw_wind_direction), h);
+                      0];
+
 
 
 init = false;
 end
+
 
 rocket.atmosphere.pressure       = pressure       (rocket.position(3));
 rocket.atmosphere.temperature    = temperature    (rocket.position(3));
