@@ -5,7 +5,7 @@ N = 200;
 A = [-0.5  1.0;
      3.5  0.8];
 
-mean_vec = [0; 4000];
+mean_vec = [0; 2000];
 impact_positions = A * randn(2, N);
 impact_positions = mean_vec + 250 * impact_positions;   % meters
 
@@ -36,7 +36,7 @@ text(lat0, lon0, ' Launch site', 'VerticalAlignment','bottom', 'HorizontalAlignm
 latA = [67.8723008, 67.8723084, 67.8723660, 67.8780572, 67.8801491, 67.8821042, 67.8832564, 67.8844700, 67.9101134, 67.9532620, 67.9761755, 67.9173745, 67.8996103, 67.8723008];
 longA = [21.0393914, 21.0515890, 21.1438720, 21.1521476, 21.1521790, 21.1562466, 21.1614810, 21.1614749, 21.1987985, 21.1982443, 20.9897495, 20.9880485, 21.0275520, 21.0393914];
 
-geoplot(latA, longA,'b', LineWidth=1);
+geoplot(latA, longA,'--', LineWidth=1);
 text(67.9101134, 21.1987985, ' Impact zone A', 'VerticalAlignment','bottom', 'HorizontalAlignment','left', 'Color','w');
 
 %% Convert ENU coordinates to geodetic
@@ -58,13 +58,10 @@ colors = lines(length(alphas));
 for i = 1:length(ellipses)
     ellipseENU = ellipses(i).points;
 
-    [latEllipse, lonEllipse, ~] = enu2geodetic(ellipseENU(1,:), ellipseENU(2,:), zeros(1, size(ellipseENU,2)), lat0, lon0, alt0, wgs84);
+    [latEllips, lonEll, ~] = enu2geodetic(ellipseENU(1,:), ellipseENU(2,:), zeros(1, size(ellipseENU,2)), lat0, lon0, alt0, wgs84);
 
-    geoplot(latEllipse, lonEllipse, 'LineWidth', 2, 'Color', colors(i,:), 'DisplayName', sprintf('%.0f%% CI', ellipses(i).alpha*100));
+    geoplot(latEll, lonEll, 'LineWidth', 2, 'Color', colors(i,:), 'DisplayName', sprintf('%.0f%% CI', ellipses(i).alpha*100));
 
 end
-
-
-
 legend('Location', 'best')
 title('Geomapped impact positions with confidence intervals')
